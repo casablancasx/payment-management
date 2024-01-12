@@ -3,6 +3,8 @@ package com.danilo.project.paymentmanagementservice.entities;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -13,6 +15,10 @@ public class User {
     private Long id;
     private String name;
     private String phone;
+
+
+    @OneToMany(mappedBy = "client")
+    private List<Work> works = new ArrayList<>();
 
     public User(){}
 
