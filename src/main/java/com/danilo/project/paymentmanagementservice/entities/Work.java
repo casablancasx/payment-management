@@ -1,10 +1,10 @@
 package com.danilo.project.paymentmanagementservice.entities;
 
-import com.danilo.project.paymentmanagementservice.entities.enums.WorkerStatus;
+import com.danilo.project.paymentmanagementservice.entities.enums.PaymentMethod;
+import com.danilo.project.paymentmanagementservice.entities.enums.PaymentStatus;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
-import java.util.Locale;
 import java.util.Objects;
 
 @Entity
@@ -15,8 +15,11 @@ public class Work {
     private Long id;
     private String destination;
     private LocalDate date;
-    private Double total;
     private Integer status;
+    private Integer method;
+    private Double total;
+    private Double deposit;
+
 
     @ManyToOne
     @JoinColumn(name = "client_id")
@@ -24,12 +27,14 @@ public class Work {
 
     public Work(){}
 
-    public Work(Long id, String destination, LocalDate date, Double total, Integer status, User client) {
+    public Work(Long id, String destination, LocalDate date, PaymentMethod method, Double total, Double deposit, User client) {
         this.id = id;
         this.destination = destination;
         this.date = date;
+        updateStatus();
+        setMethod(method);
         this.total = total;
-        this.status = status;
+        this.deposit = deposit;
         this.client = client;
     }
 
@@ -65,12 +70,24 @@ public class Work {
         this.total = total;
     }
 
-    public Integer getStatus() {
-        return status;
+    public PaymentStatus getStatus() {
+        return PaymentStatus.valueOf(status);
     }
 
-    public void setStatus(Integer status) {
-        this.status = status;
+    public void setStatus(PaymentStatus status) {
+        if (status != null){
+            this.status = status.getCode();
+        }
+    }
+
+    public PaymentMethod getMethod(){
+        return PaymentMethod.valueOf(method);
+    }
+
+    public void setMethod(PaymentMethod method){
+        if (method != null){
+            this.method = method.getCode();
+        }
     }
 
     public User getClient() {
@@ -79,6 +96,24 @@ public class Work {
 
     public void setClient(User client) {
         this.client = client;
+    }
+
+    public Double getDeposit() {
+        return deposit;
+    }
+
+    public void setDeposit(Double deposit) {
+        this.deposit = deposit;
+    }
+
+    public void updateStatus(){
+        if (getTotal() == getDeposit()){
+            setStatus(PaymentStatus.PAID);
+        } else if (getTotal() > getDeposit() && getDeposit() != null) {
+            setStatus(PaymentStatus.INCOMPLETE);
+        }else {
+            setStatus(PaymentStatus.PENDING);
+        }
     }
 
     @Override

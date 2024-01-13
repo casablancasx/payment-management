@@ -51,6 +51,13 @@ public class User {
     public void setPhone(String phone) {
         this.phone = phone;
     }
+    public Double getTotalWorksValues(){
+        Double sum = 0.0;
+        for (Work w : works){
+            sum += w.getTotal();
+        }
+        return sum;
+    }
 
     @Override
     public boolean equals(Object o) {
